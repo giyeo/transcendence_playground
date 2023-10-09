@@ -1,0 +1,49 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+	background-color: grey;
+}
+
+.paddle {
+    width: 20px;
+    height: 100px;
+    background-color: black;
+    position: absolute;
+}
+
+.horizontalWall {
+	width: 800px;
+	height: 20px;
+	background-color: black;
+	position: absolute;
+}
+
+.verticalWall {
+	width: 20px;
+	border-left: 20px dashed black;
+	height: 600px;
+	position: absolute;
+}
+
+.ball {
+	height: 20px;
+	width: 20px;
+	background-color: black;
+	border-radius: 100%;
+	position: absolute;
+  }
+
+.score {
+    font-family: 'Press Start 2P', cursive;
+	font-size: 100px;
+	position: absolute;
+}
+
+.info {
+    font-family: 'Press Start 2P', cursive;
+	font-size: 20px;
+	position: absolute;
+}
