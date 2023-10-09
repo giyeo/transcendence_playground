@@ -1,8 +1,8 @@
 <!-- App.svelte -->
-<div class="paddle"			style="top: {rect1Y}px;	left: {leftShift + 35}px;"></div>
-<div class="paddle"			style="top: {rect2Y}px;	left: {leftShift + 745}px;"></div>
+<div class="paddle"			style="top: {paddleAy}px;	left: {paddleAx}px;"></div>
+<div class="paddle"			style="top: {paddleBy}px;	left: {paddleBx}px;"></div>
 
-<div class="ball"			style="top: {ballY}px;	left: {ballX}px;"></div>
+<div class="ball"			style="top: {ball.y}px;	left: {ball.x}px;"></div>
 
 <div class="horizontalWall" style="top: {0}px;		left: {leftShift + 0}px;"></div>
 <div class="horizontalWall" style="top: {310}px;	left: {leftShift + 0}px; background-color: rgba(200,200,200,0.2);"></div>
@@ -14,38 +14,77 @@
 <div class="score"			style="top: {60}px;		left: {leftShift + 460}px;">0</div>
 
 <div class="info"			style="top: {650}px;	left: {leftShift + 0}px;">800x600px object width 20px, paddle 100px</div>
-
+<div class="info"			style="top: {650}px;	left: {leftShift + 900}px;">{paddleBx} , {paddleBy}</div>
 <!-- <div>
 	<Socket />
 </div> -->
 
 <script lang="ts">
-	// Import the Socket.IO client library
-	import Socket from './Socket.svelte';
-
 	let leftShift = 400;
-	let rect1Y = 20 + 300 - 50;
-	let rect2Y = 20 + 300 - 50;
-	let ballY = 300 + 10;
-	let ballX = 400 - 10 + leftShift;
+	let paddleAx = leftShift + 35;
+	let paddleBx = leftShift + 745;
+	let paddleAy = 20 + 300 - 50;
+	let paddleBy = 20 + 300 - 50;
+	let paddleSize = 100;
+	let topWall = 20;
+	let botWall = 600;
+	let resetx = 400 - 10 + leftShift
+	let resety = 300 + 10
+	var ball = {
+			x: resetx,
+			y: resety,
+			radians: (45 * Math.PI) / 180,
+			velocity: 3
+		};
+
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	function newBallPosition() {
+		ball.x += ball.velocity * Math.cos(ball.radians);
+		ball.y += ball.velocity * Math.sin(ball.radians);
+		if (ball.x < leftShift || ball.x > leftShift + 800) {
+		// Reflect horizontally
+			ball.x = resetx;
+			ball.y = resety;
+		}
+
+		if ( (ball.y > paddleAy && ball.y < paddleAy + paddleSize ) 
+		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 10))
+			ball.radians = Math.PI - ball.radians;
+	
+		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
+		&& (ball.x > paddleBx - 10 && ball.x < paddleBx + 10))
+			ball.radians = Math.PI - ball.radians;
+
+		if (ball.y <= topWall || ball.y >= botWall) {
+			ball.radians = -ball.radians;
+			console.log("HIT X");
+		}
+		//TO DO, add hitbox upper e lower paddle, more angles, change velocity at hit, change ball startpoint and reset, add score
+	}
+	async function gameloop() {
+		while(1) {
+			newBallPosition();
+			await sleep(1);
+		}
+	}
+	gameloop();
+	//800px x 600px //////////////////////////////////////////////////////////////////////q
+
 	let keyDownInterval = null;
 	let isKeyDown = false; // Flag to track key press
-
-	//800px x 600px  
 	function startContinuousMove(direction) {
 		if (!isKeyDown) {
 			isKeyDown = true;
 			keyDownInterval = setInterval(() => {
-				if (direction === 'up' && rect1Y >= 30) {
-					rect1Y -= 10; // Move rectangle 1 upward
-					rect2Y -= 10;
-					ballX -= 10 * 4/3;
-					ballY -= 10;
-				} else if (direction === 'down' && rect1Y < 520) {
-					rect1Y += 10; // Move rectangle 2 downward
-					rect2Y += 10;
-					ballX += 10 * 4/3;
-					ballY += 10;
+				if (direction === 'up' && paddleAy >= 30) {
+					paddleAy -= 10; // Move rectangle 1 upward
+					paddleBy -= 10;
+				} else if (direction === 'down' && paddleAy < 520) {
+					paddleAy += 10; // Move rectangle 2 downward
+					paddleBy += 10;
 				}
 			}, 20); // Adjust the interval as needed for desired speed
 		}
@@ -70,7 +109,6 @@
 			stopContinuousMove();
 		}
 	}
-
 	// Attach keydown and keyup event listeners to the document
 	document.addEventListener('keydown', handleKeyDown);
 	document.addEventListener('keyup', handleKeyUp);
