@@ -36,7 +36,7 @@
 			x: resetx,
 			y: resety,
 			radians: (45 * Math.PI) / 180,
-			velocity: 3
+			velocity: 5
 		};
 
 	function sleep(ms) {
@@ -57,21 +57,20 @@
 				ball.x = leftShift + 45;
 			}
 			ball.y = resety;
-			ball.velocity = 2.5;
+			ball.velocity = 5;
 		}
 
 		if ( (ball.y > paddleAy && ball.y < paddleAy + paddleSize ) 
 		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 10)) {
 			ball.radians = Math.PI - ball.radians;
-			ball.velocity += 0.25;
-			if(ball.velocity < 5)
+			if(ball.velocity < 10)
 				ball.velocity += 0.25;
 		}
 	
 		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
 		&& (ball.x > paddleBx - 10 && ball.x < paddleBx + 10)) {
 			ball.radians = Math.PI - ball.radians;
-			if(ball.velocity < 5)
+			if(ball.velocity < 10)
 				ball.velocity += 0.25;
 		}
 
@@ -82,6 +81,10 @@
 		//TO DO, add hitbox upper e lower paddle, more on hit pedal angles
 	}
 	async function gameloop() {
+		let fpstarget = 60;
+		let framegen = 1000/ fpstarget;
+
+		let lastframetime = 0;
 		while(1) {
 			if(scoreA > 10 || scoreB > 10) {
 				scoreA = 0;
@@ -89,7 +92,7 @@
 			}
 			newBallPosition();
 			paddleBy = ball.y - 50; //BOT IMPLEMENTATION
-			await sleep(1);
+			await sleep(10);
 		}
 	}
 	gameloop();
