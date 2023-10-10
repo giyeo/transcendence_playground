@@ -14,7 +14,7 @@
 <div class="score"			style="top: {60}px;		left: {leftShift + 460}px;">{scoreB}</div>
 
 <div class="info"			style="top: {650}px;	left: {leftShift + 0}px;">800x600px object width 20px, paddle 100px</div>
-<div class="info"			style="top: {650}px;	left: {leftShift + 900}px;">{ball.velocity}</div>
+<div class="info"			style="top: {650}px;	left: {leftShift + 900}px;">{ball.velocity} deg:{toDegre(ball.radians)} \n angle:{rad(ball.radians)}</div>
 <!-- <div>
 	<Socket />
 </div> -->
@@ -35,12 +35,20 @@
 	var ball = {
 			x: resetx,
 			y: resety,
-			radians: (45 * Math.PI) / 180,
+			radians: rad(315),
 			velocity: 5
 		};
 
 	function sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	function rad(x) {
+    	return (x % 360) * (Math.PI / 180);
+	}
+
+	function toDegre(x) {
+		return (x / Math.PI) * 180;
 	}
 
 	function newBallPosition() {
@@ -62,14 +70,26 @@
 
 		if ( (ball.y > paddleAy && ball.y < paddleAy + paddleSize ) 
 		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 10)) {
-			ball.radians = Math.PI - ball.radians;
+			
+			if(ball.y > paddleAy + 75)
+				ball.radians = rad(45);
+			else if (ball.y < paddleAy + 25)
+				ball.radians = rad(315);
+			else
+				ball.radians = Math.PI - ball.radians;
 			if(ball.velocity < 10)
 				ball.velocity += 0.25;
 		}
 	
 		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
 		&& (ball.x > paddleBx - 10 && ball.x < paddleBx + 10)) {
-			ball.radians = Math.PI - ball.radians;
+			if(ball.y > paddleBy + 75)
+				ball.radians = rad(135);
+			else if (ball.y < paddleBy + 25)
+				ball.radians = rad(225);
+			else
+				ball.radians = Math.PI - ball.radians;
+
 			if(ball.velocity < 10)
 				ball.velocity += 0.25;
 		}
@@ -80,18 +100,20 @@
 		}
 		//TO DO, add hitbox upper e lower paddle, more on hit pedal angles
 	}
-	async function gameloop() {
-		let fpstarget = 60;
-		let framegen = 1000/ fpstarget;
 
-		let lastframetime = 0;
+	async function gameloop() {
 		while(1) {
 			if(scoreA > 10 || scoreB > 10) {
 				scoreA = 0;
 				scoreB = 0;
 			}
 			newBallPosition();
-			paddleBy = ball.y - 50; //BOT IMPLEMENTATION
+			if(ball.y >= 570)
+				paddleBy = 520
+			else if(ball.y <= 70)
+				paddleBy = 20
+			else
+				paddleBy = ball.y - 50; //BOT IMPLEMENTATION
 			await sleep(10);
 		}
 	}
