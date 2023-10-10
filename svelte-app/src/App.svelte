@@ -65,7 +65,7 @@
 
 	// Function to add a new point to the list
 	function addPosition(x, y) {
-		if (ballPositionHistory.length >= 50) {
+		if (ballPositionHistory.length >= 25) {
 		// If the list has 10 or more elements, remove the oldest element
 		ballPositionHistory.shift();
 		}
@@ -95,9 +95,9 @@
 		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 10)) {
 			
 			if(ball.y > paddleAy + 75)
-				ball.radians = rad(45);
+				ball.radians = rad(60);
 			else if (ball.y < paddleAy + 25)
-				ball.radians = rad(315);
+				ball.radians = rad(300);
 			else
 				ball.radians = Math.PI - ball.radians;
 			if(ball.velocity < 10)
@@ -108,7 +108,7 @@
 		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
 		&& (ball.x > paddleBx - 10 && ball.x < paddleBx + 10)) {
 			if(ball.y > paddleBy + 75)
-				ball.radians = rad(135);
+				ball.radians = rad(150);
 			else if (ball.y < paddleBy + 25)
 				ball.radians = rad(225);
 			else
