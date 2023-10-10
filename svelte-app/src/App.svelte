@@ -21,6 +21,9 @@
 <!-- <div>
 	<Socket />
 </div> -->
+<audio id="paddle" src="./paddle.mp3"></audio>
+<audio id="wall" src="./wall.mp3"></audio>
+<audio id="score" src="./score.mp3"></audio>
 
 <script lang="ts">
 	let leftShift = 400;
@@ -42,6 +45,11 @@
 			velocity: 5
 		};
 	var ballPositionHistory = [];
+
+	function playAudio(name) {
+		const audio = document.getElementById(name);
+		audio.play();
+  	}
 
 	function sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -80,6 +88,7 @@
 			}
 			ball.y = resety;
 			ball.velocity = 5;
+			playAudio("score");
 		}
 
 		if ( (ball.y > paddleAy && ball.y < paddleAy + paddleSize ) 
@@ -93,6 +102,7 @@
 				ball.radians = Math.PI - ball.radians;
 			if(ball.velocity < 10)
 				ball.velocity += 0.25;
+			playAudio("paddle");
 		}
 	
 		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
@@ -106,10 +116,12 @@
 
 			if(ball.velocity < 10)
 				ball.velocity += 0.25;
+			playAudio("paddle");
 		}
 
 		if (ball.y <= topWall || ball.y >= botWall) {
 			ball.radians = -ball.radians;
+			playAudio("wall");
 			console.log("HIT X");
 		}
 		//TO DO, add hitbox upper e lower paddle, more on hit pedal angles
