@@ -3,6 +3,9 @@
 <div class="paddle"			style="top: {paddleBy}px;	left: {paddleBx}px;"></div>
 
 <div class="ball"			style="top: {ball.y}px;	left: {ball.x}px;"></div>
+{#each ballPositionHistory as item, index (item)}
+  <div class="ball"	style="top: {item.y}px; left: {item.x}px; opacity: 0.1;"></div>
+{/each}
 
 <div class="horizontalWall" style="top: {0}px;		left: {leftShift + 0}px;"></div>
 <div class="horizontalWall" style="top: {310}px;	left: {leftShift + 0}px; background-color: rgba(200,200,200,0.2);"></div>
@@ -38,6 +41,7 @@
 			radians: rad(315),
 			velocity: 5
 		};
+	var ballPositionHistory = [];
 
 	function sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -51,7 +55,17 @@
 		return (x / Math.PI) * 180;
 	}
 
+	// Function to add a new point to the list
+	function addPosition(x, y) {
+		if (ballPositionHistory.length >= 50) {
+		// If the list has 10 or more elements, remove the oldest element
+		ballPositionHistory.shift();
+		}
+		ballPositionHistory = [...ballPositionHistory, { x, y }];
+	}
+
 	function newBallPosition() {
+		addPosition(ball.x, ball.y);
 		ball.x += ball.velocity * Math.cos(ball.radians);
 		ball.y += ball.velocity * Math.sin(ball.radians);
 		if (ball.x < leftShift || ball.x > leftShift + 800) {
