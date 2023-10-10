@@ -108,6 +108,13 @@
 				scoreB = 0;
 			}
 			newBallPosition();
+			// if(ball.y >= 570)
+			// 	paddleAy = 520
+			// else if(ball.y <= 70)
+			// 	paddleAy = 20
+			// else
+			// 	paddleAy = ball.y - 50; //BOT IMPLEMENTATION
+
 			if(ball.y >= 570)
 				paddleBy = 520
 			else if(ball.y <= 70)
