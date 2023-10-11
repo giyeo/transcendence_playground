@@ -3,8 +3,11 @@
 <div class="paddle"			style="top: {paddleBy}px;	left: {paddleBx}px;"></div>
 
 <div class="ball"			style="top: {ball.y}px;	left: {ball.x}px;"></div>
+<div class="ball"			style="top: {620}px;	left: {intersectionX}px; background-color:red;"></div>
+
+<div class="verticalWall"	style="top: {20}px;		left: {intersectionX}px;"></div>
 {#each ballPositionHistory as item, index (item)}
-  <div class="ball"	style="top: {item.y}px; left: {item.x}px; opacity: 0.1;"></div>
+  <div class="ball" style="top: {item.y}px; left: {item.x}px; opacity: 0.1;"></div>
 {/each}
 
 <div class="horizontalWall" style="top: {0}px;		left: {leftShift + 0}px;"></div>
@@ -50,6 +53,8 @@
 		const audio = document.getElementById(name);
 		audio.play();
   	}
+	var intersectionX = 0;
+
 
 	function sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -57,6 +62,28 @@
 
 	function rad(x) {
     	return (x % 360) * (Math.PI / 180);
+	}
+
+	function predictBall() {
+		//onde = func()angulo, posição atual, posição da parede
+		let xvball = ball.x;
+		let yvball = ball.y;
+		let radvball = ball.radians % 360;
+		let isDown = 0;
+		let wallX = 20;
+		if(radvball > rad(0) && radvball < rad(180)) {
+			isDown = 1;
+			wallX = 620;
+		}
+		let intersectionXAbove = xvball - (Math.abs(yvball) / Math.tan(radvball));
+		let intersectionXBelow = xvball + (Math.abs(yvball) / Math.tan(radvball));
+
+		// Determine whether the intersection point is above or below
+		if (yvball > 0) {
+			intersectionX = intersectionXAbove; //above
+		} else {
+			intersectionX = intersectionXBelow;
+		}
 	}
 
 	function toDegre(x) {
@@ -67,7 +94,7 @@
 	function addPosition(x, y) {
 		if (ballPositionHistory.length >= 25) {
 		// If the list has 10 or more elements, remove the oldest element
-		ballPositionHistory.shift();
+			ballPositionHistory.shift();
 		}
 		ballPositionHistory = [...ballPositionHistory, { x, y }];
 	}
@@ -93,7 +120,6 @@
 
 		if ( (ball.y > paddleAy && ball.y < paddleAy + paddleSize ) 
 		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 10)) {
-			
 			if(ball.y > paddleAy + 75)
 				ball.radians = rad(60);
 			else if (ball.y < paddleAy + 25)
@@ -103,6 +129,7 @@
 			if(ball.velocity < 10)
 				ball.velocity += 0.25;
 			playAudio("paddle");
+			predictBall();
 		}
 	
 		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
