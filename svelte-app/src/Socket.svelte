@@ -1,44 +1,37 @@
+<!-- Chat.svelte -->
 <script>
 	import { onMount } from 'svelte';
 	import io from 'socket.io-client';
   
-	let socket;
-  
-	// Define a variable to store incoming messages
 	let messages = [];
+	let message = '';
   
-	// Initialize the WebSocket connection
-	onMount(() => {
-	  socket = io('http://localhost:3000'); // Replace with your server URL
+	const socket = io('http://localhost:5000'); // Replace with your Socket.IO server URL
   
-	  // Handle incoming messages from the server
-	  socket.on('message', (message) => {
-		messages = [...messages, message]; // Add the message to the messages array
-	  });
+	socket.on('message', (data) => {
+	  messages = [...messages, data];
 	});
   
-	// Function to send a message to the server
-	function sendMessage() {
-	  const messageText = 'Hello, server!';
-	  socket.emit('message', messageText);
-	}
+	const sendMessage = () => {
+	  if (message) {
+		socket.emit('message', message);
+		message = '';
+	  }
+	};
+  
+	onMount(() => {
+	  socket.emit('join', 'User has joined the chat');
+	});
   </script>
   
-  <style>
-	/* Your component styles */
-  </style>
-  
   <div>
-	<h1>WebSocket Chat</h1>
-  
-	<!-- Display incoming messages -->
 	<ul>
-	  {#each messages as message (message.id)}
-		<li>{message}</li>
+	  {#each messages as msg (msg.id)}
+		<li>{msg}</li>
 	  {/each}
 	</ul>
   
-	<!-- Button to send a message -->
-	<button on:click={sendMessage}>Send Message</button>
+	<input bind:value={message} on:input={e => message = e.target.value} />
+	<button on:click={sendMessage}>Send</button>
   </div>
   
