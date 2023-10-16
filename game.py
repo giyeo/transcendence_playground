@@ -9,8 +9,18 @@ botWall = 600
 middleX = 400 - 10 + leftShift
 middleY = 300 + 10
 
+
 def newBallPosition(aY, bY, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB):
+	
+	#bot
+	if(ballY >= 570):
+		bY = 520
+	elif(ballY <= 70):
+		bY = 20
+	else:
+		bY = ballY - 50
 	# print(aY, bY, ballX, ballY, ballVelocity)
+	
 	ballX += ballVelocity * math.cos(ballRad)
 	ballY += ballVelocity * math.sin(ballRad)
 	#ball went off limits
@@ -48,14 +58,6 @@ def newBallPosition(aY, bY, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB)
 	#hit wall
 	if (ballY <= topWall or ballY >= botWall):
 		ballRad = -ballRad
-
-	#bot
-	if(ballY >= 570):
-		bY = 520
-	elif(ballY <= 70):
-		bY = 20
-	else:
-		bY = ballY - 50
 
 	return ({
 		'aY':aY,

@@ -18,7 +18,7 @@
 <div class="score"			style="top: {60}px;		left: {leftShift + 460}px;">{scoreB}</div>
 
 <div class="info"			style="top: {650}px;	left: {leftShift + 0}px;">{stop} 800x600px object width 20px, paddle 100px</div>
-<div class="info"			style="top: {650}px;	left: {leftShift + 900}px;">{ball.velocity} deg:{toDegre(ball.radians)} \n angle:{rad(ball.radians)}</div>
+<div class="info"			style="top: {650}px;	left: {leftShift + 900}px;">vel:{ball.velocity} deg:{toDegre(ball.radians)} \n angle:{rad(ball.radians)}</div>
 <!-- <div>
 	<Socket />
 </div> -->
@@ -26,11 +26,10 @@
 <audio id="wall" src="./wall.mp3"></audio>
 <audio id="score" src="./score.mp3"></audio>
 
-<script lang="ts">
+<script lang="js">
 	import { onMount } from 'svelte';
 	import io from 'socket.io-client';
 	let player = 'A'
-	let frametime = 8
 	let leftShift = 400;
 	let scoreA = 0;
 	let scoreB = 0;
@@ -52,7 +51,8 @@
 		};
 	var ballPositionHistory = [];
 	
-	const socket = io('http://localhost:5000'); // Replace with your Socket.IO server URL
+	const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
+	// const socket = io('localhost:5000');
 	socket.on('game', (data) => {
 		if(player === 'B')
 			paddleAy = data.data.aY;//i dont receive myself, only if i'm player B
@@ -64,18 +64,17 @@
 		ball.velocity = data.data.ballVelocity;
 		scoreA = data.data.scoreA;
 		scoreB = data.data.scoreB;
+		if(scoreA > 10 || scoreB > 10) {
+				scoreA = 0;
+				scoreB = 0;
+		}
+		gameloop()
 	});
 
 	const game = () => {
 		socket.emit('game', {
-			aY: paddleAy,
-			bY: paddleBy,
-			ballY: ball.y,
-			ballX: ball.x,
-			ballRad: ball.radians,
-			ballVelocity: ball.velocity,
-			scoreA: scoreA,
-			scoreB: scoreB
+			aY: paddleAy,//
+			bY: paddleBy
 		});
 	};
 
@@ -87,10 +86,6 @@
 		const audio = document.getElementById(name);
 		audio.play();
   	}
-
-	function sleep(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	}
 
 	function rad(x) {
     	return ((x % 360) * (Math.PI / 180)) % 360;
@@ -129,26 +124,12 @@
 		}
 	}
 
-	function newBallPosition() {
-		game()
+	function gameloop() {
 		addPosition(ball.x, ball.y);
+		game()
 		soundByPosition();
 	}
 
-	async function gameloop() {
-		while(1) {
-			if(stop == -1) {
-				await sleep(frametime);
-				continue;
-			}
-			if(scoreA > 10 || scoreB > 10) {
-				scoreA = 0;
-				scoreB = 0;
-			}
-			newBallPosition();
-			await sleep(frametime);
-		}
-	}
 	gameloop();
 	//800px x 600px //////////////////////////////////////////////////////////////////////q
 
