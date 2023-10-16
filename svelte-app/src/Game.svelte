@@ -51,8 +51,8 @@
 		};
 	var ballPositionHistory = [];
 	
-	// const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
-	const socket = io('localhost:5000');
+	const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
+	// const socket = io('localhost:5000');
 	socket.on('game', (data) => {
 		if(player === 'B')
 			paddleAy = data.data.aY;//i dont receive myself, only if i'm player B
@@ -133,7 +133,7 @@
 			game()
 			addPosition(ball.x, ball.y);
 			soundByPosition();
-			await sleep(16); //60fps
+			await sleep(16.7); //60fps
 		}
 	}
 

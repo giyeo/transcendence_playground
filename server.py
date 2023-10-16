@@ -9,6 +9,9 @@ recv = 0
 timeA = int(time.time() * 1000)
 emits = 0
 
+#create a hashmap or list, that receives the SID as key, to access current gamedata
+# preferabble with O(1). like, gamedata[sid].ballY, or something
+# that will enable multiclient play our games
 leftShift = 400
 ballY = 300 + 10
 ballX = 400 - 10 + leftShift
@@ -20,7 +23,7 @@ scoreB = 0
 def gameloop(sid, data):
 	global emits, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB
 
-	time.sleep(1/(70)) # 70 frames per second
+	time.sleep(1/60) # 70 frames per second
 
 	newData = newBallPosition(
 		data['aY'], data['bY'],
