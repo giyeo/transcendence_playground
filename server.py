@@ -20,7 +20,7 @@ scoreB = 0
 def gameloop(sid, data):
 	global emits, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB
 
-	time.sleep(1/(120))
+	time.sleep(1/(70)) # 70 frames per second
 
 	newData = newBallPosition(
 		data['aY'], data['bY'],

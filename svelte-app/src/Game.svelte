@@ -133,7 +133,7 @@
 			game()
 			addPosition(ball.x, ball.y);
 			soundByPosition();
-			await sleep(16);
+			await sleep(16); //60fps
 		}
 	}
 
