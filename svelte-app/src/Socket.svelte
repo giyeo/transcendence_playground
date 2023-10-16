@@ -2,36 +2,35 @@
 <script>
 	import { onMount } from 'svelte';
 	import io from 'socket.io-client';
-  
+
 	let messages = [];
 	let message = '';
-  
+
 	const socket = io('http://localhost:5000'); // Replace with your Socket.IO server URL
-  
+
 	socket.on('message', (data) => {
-	  messages = [...messages, data];
+	messages = [...messages, data.data];
 	});
-  
+
 	const sendMessage = () => {
-	  if (message) {
+	if (message) {
 		socket.emit('message', message);
 		message = '';
-	  }
+	}
 	};
-  
+
 	onMount(() => {
-	  socket.emit('join', 'User has joined the chat');
+	socket.emit('join', 'User has joined the chat');
 	});
-  </script>
-  
-  <div>
+</script>
+
+<div>
 	<ul>
-	  {#each messages as msg (msg.id)}
+	{#each messages as msg}
 		<li>{msg}</li>
-	  {/each}
+	{/each}
 	</ul>
-  
+
 	<input bind:value={message} on:input={e => message = e.target.value} />
 	<button on:click={sendMessage}>Send</button>
-  </div>
-  
+</div>

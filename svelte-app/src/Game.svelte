@@ -4,7 +4,6 @@
 
 <div class="ball"			style="top: {ball.y}px;	left: {ball.x}px;"></div>
 
-<div class="verticalWall"	style="top: {20}px;		left: {intersectionX}px; border-color:red;"></div>
 {#each ballPositionHistory as item, index (item)}
   <div class="ball" style="top: {item.y}px; left: {item.x}px; opacity: 0.1;"></div>
 {/each}
@@ -28,6 +27,10 @@
 <audio id="score" src="./score.mp3"></audio>
 
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import io from 'socket.io-client';
+
+	let frametime = 8
 	let leftShift = 400;
 	let scoreA = 0;
 	let scoreB = 0;
@@ -48,13 +51,40 @@
 			velocity: 5
 		};
 	var ballPositionHistory = [];
+	
+	const socket = io('http://localhost:5000'); // Replace with your Socket.IO server URL
+	socket.on('game', (data) => {
+		// paddleAy = data.data.aY;
+		// paddleBy = data.data.bY;
+		ball.x = data.data.ballX;
+		ball.y = data.data.ballY;
+		ball.radians = data.data.ballRad;
+		ball.velocity = data.data.ballVelocity;
+		scoreA = data.data.scoreA;
+		scoreB = data.data.scoreB;
+	});
+
+	const game = () => {
+		socket.emit('game', {
+			aY: paddleAy,
+			bY: paddleBy,
+			ballY: ball.y,
+			ballX: ball.x,
+			ballRad: ball.radians,
+			ballVelocity: ball.velocity,
+			scoreA: scoreA,
+			scoreB: scoreB
+		});
+	};
+
+	onMount(() => {
+	socket.emit('join', 'User has joined the game');
+	});
 
 	function playAudio(name) {
 		const audio = document.getElementById(name);
 		audio.play();
   	}
-	var intersectionX = 0;
-
 
 	function sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -62,19 +92,6 @@
 
 	function rad(x) {
     	return ((x % 360) * (Math.PI / 180)) % 360;
-	}
-
-	function predictBall() {
-		//onde = func()angulo, posição atual, posição da parede
-		let xvball = ball.x;
-		let yvball = ball.y;
-		let radvball = ball.radians % 360;
-
-		let wallY = 30;
-		if(radvball >= rad(0) && radvball <= rad(180))
-			wallY = 610;
-		let m = Math.tan(radvball);
-  		intersectionX = xvball + ((wallY - yvball) / m);
 	}
 
 	function toDegre(x) {
@@ -90,61 +107,30 @@
 		ballPositionHistory = [...ballPositionHistory, { x, y }];
 	}
 
-	function newBallPosition() {
-		addPosition(ball.x, ball.y);
-		ball.x += ball.velocity * Math.cos(ball.radians);
-		ball.y += ball.velocity * Math.sin(ball.radians);
+	function soundByPosition() {
 		if (ball.x < leftShift || ball.x > leftShift + 800) {
-		// Reflect horizontally
-			if(ball.x < leftShift) {
-				scoreB += 1;
-				ball.x = leftShift + 735;
-			}
-			else {
-				scoreA += 1;
-				ball.x = leftShift + 45;
-			}
-			ball.y = resety;
-			ball.velocity = 5;
 			playAudio("score");
-
 		}
 
 		if ( (ball.y > paddleAy && ball.y < paddleAy + paddleSize ) 
 		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 10)) {
-			if(ball.y > paddleAy + 75)
-				ball.radians = rad(60);
-			else if (ball.y < paddleAy + 25)
-				ball.radians = rad(300);
-			else
-				ball.radians = (Math.PI - ball.radians) % 360;
-			if(ball.velocity < 10)
-				ball.velocity += 0.25;
 			playAudio("paddle");
-			predictBall();
 		}
 	
 		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
 		&& (ball.x > paddleBx - 10 && ball.x < paddleBx + 10)) {
-			if(ball.y > paddleBy + 75)
-				ball.radians = rad(150);
-			else if (ball.y < paddleBy + 25)
-				ball.radians = rad(225);
-			else
-				ball.radians = (Math.PI - ball.radians) % 360;
-
-			if(ball.velocity < 10)
-				ball.velocity += 0.25;
 			playAudio("paddle");
-			predictBall();
 		}
 
 		if (ball.y <= topWall || ball.y >= botWall) {
-			ball.radians = -ball.radians;
 			playAudio("wall");
-			predictBall();
 		}
-		//TO DO, add hitbox upper e lower paddle, more on hit pedal angles
+	}
+
+	function newBallPosition() {
+		game()
+		addPosition(ball.x, ball.y);
+		soundByPosition();
 	}
 
 	async function gameloop() {
@@ -153,23 +139,8 @@
 				scoreA = 0;
 				scoreB = 0;
 			}
-			// if(stop < 0)
-			// 	break;
 			newBallPosition();
-			// if(ball.y >= 570)
-			// 	paddleAy = 520
-			// else if(ball.y <= 70)
-			// 	paddleAy = 20
-			// else
-			// 	paddleAy = ball.y - 50; //BOT IMPLEMENTATION
-
-			if(ball.y >= 570)
-				paddleBy = 520
-			else if(ball.y <= 70)
-				paddleBy = 20
-			else
-				paddleBy = ball.y - 50; //BOT IMPLEMENTATION
-			await sleep(10);
+			await sleep(frametime);
 		}
 	}
 	gameloop();
@@ -183,12 +154,12 @@
 			keyDownInterval = setInterval(() => {
 				if (direction === 'up' && paddleAy >= 30) {
 					paddleAy -= 10; // Move rectangle 1 upward
-					// paddleBy -= 10;
+					paddleBy -= 10;
 				} else if (direction === 'down' && paddleAy < 520) {
 					paddleAy += 10; // Move rectangle 2 downward
-					// paddleBy += 10;
+					paddleBy += 10;
 				}
-			}, 15); // Adjust the interval as needed for desired speed
+			}, 16); // Adjust the interval as needed for desired speed
 		}
 	}
 
