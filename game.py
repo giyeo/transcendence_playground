@@ -27,15 +27,15 @@ def newBallPosition(aY, bY, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB)
 	if (ballX < leftShift or ballX > leftShift + 800):
 		if(ballX < leftShift):
 			scoreB += 1
-			ballX = bX - 10
+			ballX = bX - 20
 		else:
 			scoreA += 1
-			ballX = aX + 10
+			ballX = aX + 20
 		ballY = middleY
 		ballVelocity = 5
 	#hit paddle A
 	if ((ballY > aY and ballY < aY + paddleSize) 
-	and (ballX > aX - 10 and ballX < aX + 10) ):
+	and (ballX > aX - 10 and ballX < aX + 20) ):
 		if(ballY > aY + 75):
 			ballRad = math.radians(60)
 		elif (ballY < aY + 25):
@@ -46,7 +46,7 @@ def newBallPosition(aY, bY, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB)
 			ballVelocity += 0.25 
 	#hit paddle B
 	if ((ballY > bY and ballY < bY + paddleSize)
-	and (ballX > bX - 10 and ballX < bX + 10)):
+	and (ballX > bX - 20 and ballX < bX + 10)):
 		if(ballY > bY + 75):
 			ballRad = math.radians(150)
 		elif (ballY < bY + 25):

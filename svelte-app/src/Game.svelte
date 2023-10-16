@@ -110,12 +110,12 @@
 		}
 
 		if ( (ball.y > paddleAy && ball.y < paddleAy + paddleSize ) 
-		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 10)) {
+		&& (ball.x > paddleAx - 10 && ball.x < paddleAx + 20)) {
 			playAudio("paddle");
 		}
 	
 		if ( (ball.y > paddleBy && ball.y < paddleBy + paddleSize ) 
-		&& (ball.x > paddleBx - 10 && ball.x < paddleBx + 10)) {
+		&& (ball.x > paddleBx - 20 && ball.x < paddleBx + 10)) {
 			playAudio("paddle");
 		}
 
