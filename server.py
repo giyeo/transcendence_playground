@@ -20,10 +20,18 @@ ballVelocity = 5
 scoreA = 0
 scoreB = 0
 
+def calcTime():
+	global recv, timeA, emits
+	recv = recv + 1
+	timeB = int(time.time() * 1000)
+	if (timeB - timeA >= 1000):
+		print(f"recv: {recv}, emits:{emits}")
+		timeA = timeB
+		emits = 0
+		recv = 0
+		
 def gameloop(sid, data):
 	global emits, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB
-
-	time.sleep(1/60) # 70 frames per second
 
 	newData = newBallPosition(
 		data['aY'], data['bY'],
@@ -39,26 +47,14 @@ def gameloop(sid, data):
 
 	sio.emit('game', {'data': newData}, room=sid)
 	emits += 1
+	calcTime()
 
 @sio.event
 def game(sid, data):
-	global recv
-	global timeA
-	global calc
-	global emits
-	calc = False
-	recv = recv + 1
-	timeB = int(time.time() * 1000)
-	if (timeB - timeA >= 1000):
-		print(f"recv: {recv}, emits:{emits}")
-		timeA = timeB
-		emits = 0
-		recv = 0
-	#set game fps
+	gameloop(sid, data)
 	#if not set in localhost, it get 1000 recv in the front, but in ngrok only 30 recv
 	#this happens because it only ASKS when it comes, so the backend should send even
 	#if the front dont asks for it. so, there will be N frames with the same front data
-	gameloop(sid, data)
 
 @sio.event
 def connect(sid, environ):
