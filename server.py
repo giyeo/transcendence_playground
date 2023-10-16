@@ -23,7 +23,6 @@ def game(sid, data):
 	sio.emit('game', {'data': newData}, room=sid)
 	# print( int(time.time() * 1000) - current_time, "ms")
 
-
 @sio.event
 def message(sid, data):
 	print(f"Received message: {data}")

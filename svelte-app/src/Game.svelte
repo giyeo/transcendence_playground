@@ -29,7 +29,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import io from 'socket.io-client';
-
+	let player = 'A'
 	let frametime = 8
 	let leftShift = 400;
 	let scoreA = 0;
@@ -54,8 +54,10 @@
 	
 	const socket = io('http://localhost:5000'); // Replace with your Socket.IO server URL
 	socket.on('game', (data) => {
-		// paddleAy = data.data.aY;
-		// paddleBy = data.data.bY;
+		if(player === 'B')
+			paddleAy = data.data.aY;//i dont receive myself, only if i'm player B
+		else
+			paddleBy = data.data.bY;
 		ball.x = data.data.ballX;
 		ball.y = data.data.ballY;
 		ball.radians = data.data.ballRad;
@@ -135,6 +137,10 @@
 
 	async function gameloop() {
 		while(1) {
+			if(stop == -1) {
+				await sleep(frametime);
+				continue;
+			}
 			if(scoreA > 10 || scoreB > 10) {
 				scoreA = 0;
 				scoreB = 0;
@@ -154,10 +160,10 @@
 			keyDownInterval = setInterval(() => {
 				if (direction === 'up' && paddleAy >= 30) {
 					paddleAy -= 10; // Move rectangle 1 upward
-					paddleBy -= 10;
+					// paddleBy -= 10;
 				} else if (direction === 'down' && paddleAy < 520) {
 					paddleAy += 10; // Move rectangle 2 downward
-					paddleBy += 10;
+					// paddleBy += 10;
 				}
 			}, 16); // Adjust the interval as needed for desired speed
 		}
@@ -181,11 +187,11 @@
 		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
 			stopContinuousMove();
 		}
-		// if (event.code === 'Space') {
-		// 	if(stop < 0)
-		// 		gameloop();
-		// 	stop = stop * -1;
-		// }
+		if (event.code === 'Space') {
+			if(stop < 0)
+				gameloop();
+			stop = stop * -1;
+		}
 	}
 	// Attach keydown and keyup event listeners to the document
 	document.addEventListener('keydown', handleKeyDown);
