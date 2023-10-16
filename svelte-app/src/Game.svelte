@@ -78,7 +78,7 @@
 	};
 
 	onMount(() => {
-	socket.emit('join', 'User has joined the game');
+		socket.emit('join', 'User has joined the game');
 	});
 
 	function playAudio(name) {
@@ -133,7 +133,7 @@
 			game()
 			addPosition(ball.x, ball.y);
 			soundByPosition();
-			await sleep(16.7); //60fps
+			await sleep(16); //60fps
 		}
 	}
 

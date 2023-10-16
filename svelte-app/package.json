@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "dev": "HOST=0.0.0.0 PORT=8080 rollup -c -w",
     "start": "sirv public --no-clear"
   },
   "devDependencies": {

@@ -20,12 +20,12 @@ ballVelocity = 5
 scoreA = 0
 scoreB = 0
 
-def calcTime():
+def calcTime(sid):
 	global recv, timeA, emits
 	recv = recv + 1
 	timeB = int(time.time() * 1000)
 	if (timeB - timeA >= 1000):
-		print(f"recv: {recv}, emits:{emits}")
+		print(f"sid: {sid} requests/s: {recv}, response/s:{emits}")
 		timeA = timeB
 		emits = 0
 		recv = 0
@@ -47,7 +47,7 @@ def gameloop(sid, data):
 
 	sio.emit('game', {'data': newData}, room=sid)
 	emits += 1
-	calcTime()
+	calcTime(sid)
 
 @sio.event
 def game(sid, data):
