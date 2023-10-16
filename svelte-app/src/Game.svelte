@@ -51,8 +51,8 @@
 		};
 	var ballPositionHistory = [];
 	
-	const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
-	// const socket = io('localhost:5000');
+	// const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
+	const socket = io('localhost:5000');
 	socket.on('game', (data) => {
 		if(player === 'B')
 			paddleAy = data.data.aY;//i dont receive myself, only if i'm player B
@@ -68,7 +68,6 @@
 				scoreA = 0;
 				scoreB = 0;
 		}
-		gameloop()
 	});
 
 	const game = () => {
@@ -96,6 +95,7 @@
 	}
 
 	// Function to add a new point to the list
+	//create client predict tail
 	function addPosition(x, y) {
 		if (ballPositionHistory.length >= 25) {
 		// If the list has 10 or more elements, remove the oldest element
@@ -124,10 +124,17 @@
 		}
 	}
 
-	function gameloop() {
-		addPosition(ball.x, ball.y);
-		game()
-		soundByPosition();
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	async function gameloop() {
+		while(1) {
+			game()
+			addPosition(ball.x, ball.y);
+			soundByPosition();
+			await sleep(16);
+		}
 	}
 
 	gameloop();
