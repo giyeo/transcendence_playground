@@ -13,14 +13,7 @@ emits = 0
 # preferabble with O(1). like, gamedata[sid].ballY, or something
 # that will enable multiclient play our games
 gamedata = {}
-#
 leftShift = 400
-ballY = 300 + 10
-ballX = 400 - 10 + leftShift
-ballRad = math.radians(315)
-ballVelocity = 5
-scoreA = 0
-scoreB = 0
 
 def calcTime(sid):
 	global recv, timeA, emits
@@ -33,9 +26,7 @@ def calcTime(sid):
 		recv = 0
 		
 def gameloop(sid, data):
-	global emits, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB
-
-	global gamedata
+	global gamedata, emits, recv
 	if(gamedata.get(sid) is None):
 		gamedata[sid] = {}
 		gamedata[sid]['aY'] = data['aY']
@@ -83,4 +74,4 @@ def message(sid, data):
 
 if __name__ == '__main__':
 	import eventlet
-	eventlet.wsgi.server(eventlet.listen(('localhost', 5000)), app)
+	eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 5000)), app)
