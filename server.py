@@ -24,9 +24,9 @@ def calcTime(sid):
 		timeA = timeB
 		emits = 0
 		recv = 0
-		
+
 def gameloop(sid, data):
-	global gamedata, emits, recv
+	global gamedata, emits
 	if(gamedata.get(sid) is None):
 		gamedata[sid] = {}
 		gamedata[sid]['aY'] = data['aY']
@@ -41,14 +41,12 @@ def gameloop(sid, data):
 		gamedata[sid]['aY'] = data['aY']
 		gamedata[sid]['bY'] = data['bY']
 
-	newData = newBallPosition(
+	gamedata[sid] = newBallPosition(
 		gamedata[sid]['aY'], gamedata[sid]['bY'],
 		gamedata[sid]['ballY'], gamedata[sid]['ballX'], gamedata[sid]['ballRad'], gamedata[sid]['ballVelocity'],
 		gamedata[sid]['scoreA'], gamedata[sid]['scoreB'])
-	
-	gamedata[sid] = newData
 
-	sio.emit('game', {'data': newData}, room=sid)
+	sio.emit('game', {'data': gamedata[sid]}, room=sid)
 	emits += 1
 	calcTime(sid)
 
@@ -65,7 +63,8 @@ def connect(sid, environ):
 
 @sio.event
 def disconnect(sid):
-	print(f"Client disconnected: {sid}")
+	print(f"Client disconnected: {sid}, deleting gamedata")
+	del gamedata[sid] #TODO that can cause major bugs when multiplayer is enabled
 
 @sio.event
 def message(sid, data):
