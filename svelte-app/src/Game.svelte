@@ -51,15 +51,32 @@
 		};
 	var ballPositionHistory = [];
 	
-	const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
+	// const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
+	const socket = io('34.95.142.132:5000')
 	// const socket = io('localhost:5000');
+	async function goToPosition(newX, newY) {//interpolation, adding frames between
+		var oldX = ball.x;
+		var oldY = ball.y;
+		var DLSS = 5;
+		var i = 0
+		while(i < DLSS) {
+			ball.x += ((newX - oldX) / DLSS);
+			ball.y += ((newY - oldY) / DLSS);
+			await sleep(15 / DLSS);
+			i++;
+		}
+		ball.x = newX;
+		ball.y = newY;
+	}
+
 	socket.on('game', (data) => {
 		if(player === 'B')
 			paddleAy = data.data.aY;//i dont receive myself, only if i'm player B
 		else
 			paddleBy = data.data.bY;
-		ball.x = data.data.ballX;
-		ball.y = data.data.ballY;
+		// ball.x = data.data.ballX;
+		// ball.y = data.data.ballY;
+		goToPosition(data.data.ballX, data.data.ballY)
 		ball.radians = data.data.ballRad;
 		ball.velocity = data.data.ballVelocity;
 		scoreA = data.data.scoreA;

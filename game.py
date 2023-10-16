@@ -9,7 +9,7 @@ botWall = 600
 middleX = 400 - 10 + leftShift
 middleY = 300 + 10
 
-
+#garanta que só bata 1 vez a bola por paddle
 def newBallPosition(aY, bY, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB):
 	
 	#bot
