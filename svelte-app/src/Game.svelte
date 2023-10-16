@@ -29,6 +29,7 @@
 <script lang="js">
 	import { onMount } from 'svelte';
 	import io from 'socket.io-client';
+	let framerate = 12; //16 = 60fps
 	let player = 'A'
 	let leftShift = 400;
 	let scoreA = 0;
@@ -52,18 +53,20 @@
 	var ballPositionHistory = [];
 	
 	// const socket = io('0.tcp.sa.ngrok.io:19720'); // Replace with your Socket.IO server URL
-	const socket = io('34.95.142.132:5000')
-	// const socket = io('localhost:5000');
+	// const socket = io('34.95.142.132:5000')
+	const socket = io('localhost:5000');
 	async function goToPosition(newX, newY) {//interpolation, adding frames between
 		var oldX = ball.x;
 		var oldY = ball.y;
-		var DLSS = 5;
+		var DLSS = 4;
 		var i = 0
-		while(i < DLSS) {
-			ball.x += ((newX - oldX) / DLSS);
-			ball.y += ((newY - oldY) / DLSS);
-			await sleep(15 / DLSS);
-			i++;
+		if(Math.abs(newX-oldX) < 300 ) {
+			while(i < DLSS) {
+				ball.x += ((newX - oldX) / DLSS );
+				ball.y += ((newY - oldY) / DLSS );
+				await sleep(framerate / DLSS );
+				i++;
+			}
 		}
 		ball.x = newX;
 		ball.y = newY;
@@ -150,7 +153,7 @@
 			game()
 			addPosition(ball.x, ball.y);
 			soundByPosition();
-			await sleep(16); //60fps
+			await sleep(framerate);
 		}
 	}
 

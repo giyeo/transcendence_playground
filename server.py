@@ -12,6 +12,8 @@ emits = 0
 #create a hashmap or list, that receives the SID as key, to access current gamedata
 # preferabble with O(1). like, gamedata[sid].ballY, or something
 # that will enable multiclient play our games
+gamedata = {}
+#
 leftShift = 400
 ballY = 300 + 10
 ballX = 400 - 10 + leftShift
@@ -33,17 +35,27 @@ def calcTime(sid):
 def gameloop(sid, data):
 	global emits, ballY, ballX, ballRad, ballVelocity, scoreA, scoreB
 
+	global gamedata
+	if(gamedata.get(sid) is None):
+		gamedata[sid] = {}
+		gamedata[sid]['aY'] = data['aY']
+		gamedata[sid]['bY'] = data['bY']
+		gamedata[sid]['ballY'] = 300 + 10
+		gamedata[sid]['ballX'] = 400 - 10 + leftShift
+		gamedata[sid]['ballRad'] = math.radians(315)
+		gamedata[sid]['ballVelocity'] = 5
+		gamedata[sid]['scoreA'] = 0
+		gamedata[sid]['scoreB'] = 0
+	else:
+		gamedata[sid]['aY'] = data['aY']
+		gamedata[sid]['bY'] = data['bY']
+
 	newData = newBallPosition(
-		data['aY'], data['bY'],
-		ballY, ballX, ballRad, ballVelocity,
-		scoreA, scoreB)
+		gamedata[sid]['aY'], gamedata[sid]['bY'],
+		gamedata[sid]['ballY'], gamedata[sid]['ballX'], gamedata[sid]['ballRad'], gamedata[sid]['ballVelocity'],
+		gamedata[sid]['scoreA'], gamedata[sid]['scoreB'])
 	
-	ballY = newData['ballY']
-	ballX = newData['ballX']
-	ballRad =  newData['ballRad']
-	ballVelocity = newData['ballVelocity']
-	scoreA = newData['scoreA']
-	scoreB = newData['scoreB']
+	gamedata[sid] = newData
 
 	sio.emit('game', {'data': newData}, room=sid)
 	emits += 1
